@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useElderStore } from '../stores/elderStore';
 
 export default function ElderRegistration() {
   const navigate = useNavigate();
   const setCurrentElder = useElderStore((state) => state.setCurrentElder);
-
+useEffect(() => {
+    navigate('/dashboard');
+  }, []);
   const [formData, setFormData] = useState({
     name: '',
     birthDate: '',

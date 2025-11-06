@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCreateTimeCapsule } from '../hooks/useApi';
-import { useElderStore } from '../stores/elderStore';
+import { useCreateTimeCapsule } from '../../hooks/useApi';
+import { useElderStore } from '../../stores/elderStore';
 
 const categories = ['가족', '취미', '일상', '추억', '기타'];
 const emotionTags = ['행복', '그리움', '평온', '기대', '감사', '설렘', '뿌듯함'];

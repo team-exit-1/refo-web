@@ -43,6 +43,14 @@ export const useInteractionGuide = (elderId: string) => {
   });
 };
 
+export const useAnalysisReport = (elderId: string) => {
+  return useQuery({
+    queryKey: ['analysisReport', elderId],
+    queryFn: () => memoryApi.getAnalysisReport(elderId),
+    enabled: !!elderId,
+  });
+};
+
 // Location hooks
 export const useCurrentLocation = (elderId: string) => {
   return useQuery({

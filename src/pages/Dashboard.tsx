@@ -10,8 +10,12 @@ import {
   LinearScale,
   BarElement,
 } from 'chart.js';
-import { Radar, Line, Bar } from 'react-chartjs-2';
-import { useMemoryScores, useCognitiveMetrics, useInteractionGuide } from '../hooks/useApi';
+import { Radar } from 'react-chartjs-2';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+import { useMemoryScores, useCognitiveMetrics, useAnalysisReport } from '../hooks/useApi';
 import { useElderStore } from '../stores/elderStore';
 
 ChartJS.register(
@@ -30,7 +34,41 @@ export default function Dashboard() {
   const currentElder = useElderStore((state) => state.currentElder);
   const { data: memoryScores } = useMemoryScores(currentElder?.elder_id || '');
   const { data: cognitiveMetrics } = useCognitiveMetrics(currentElder?.elder_id || '');
-  const { data: interactionGuide } = useInteractionGuide(currentElder?.elder_id || '');
+  const { data: analysisReport, isLoading: isReportLoading } = useAnalysisReport(currentElder?.elder_id || '');
+
+  // 데이터가 없을 때 표시할 예시 Markdown
+  const exampleMarkdown = `# 인지·언어 상태 분석 리포트 (예시)
+
+## 📊 종합 점수
+
+현재 어르신의 전반적인 인지 기능을 분석한 결과입니다.
+
+- **전체 기억 점수**: $\\overline{x} = 77.5$점
+- **평가 기준일**: 2025년 11월 6일
+
+---
+
+## 🧠 주제별 기억 분석
+
+### 1. 가족 관련 기억 (85점)
+가족에 대한 기억이 가장 강하게 유지되고 있습니다. 특히 **손주**에 대한 기억이 선명합니다.
+
+$$
+\\text{Family Score} = \\frac{\\sum_{i=1}^{n} w_i \\cdot s_i}{n} = 85
+$$
+
+**권장 사항**:
+- 가족 사진 앨범을 함께 보며 추억 이야기 나누기
+- 손주들과의 정기적인 영상 통화 유지
+
+### 2. 직업/경력 관련 기억 (70점)
+직업 관련 기억은 중간 수준입니다. 일부 세부사항이 흐릿해지는 경향이 있습니다.
+
+**권장 사항**:
+- 과거 직장 동료들과의 만남 주선
+- 직업 관련 성취에 대한 대화 유도
+
+`;
 
   const latestMemoryScore = memoryScores?.[0];
 
@@ -73,138 +111,8 @@ export default function Dashboard() {
     },
   };
 
-  // 라인 차트 데이터 (인지 기능 변화)
-  const lineData = {
-    labels: cognitiveMetrics?.map((m) => m.date) || [],
-    datasets: [
-      {
-        label: '문장 길이',
-        data: cognitiveMetrics?.map((m) => m.sentence_length) || [],
-        borderColor: 'rgba(174, 147, 223, 1)',
-        backgroundColor: 'rgba(174, 147, 223, 0.1)',
-        tension: 0.4,
-      },
-      {
-        label: '어휘 다양성',
-        data: cognitiveMetrics?.map((m) => m.word_diversity) || [],
-        borderColor: 'rgba(102, 103, 179, 1)',
-        backgroundColor: 'rgba(102, 103, 179, 0.1)',
-        tension: 0.4,
-      },
-    ],
-  };
-
-  const lineOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top' as const,
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-      },
-    },
-  };
-
-  // 막대 그래프 데이터 (대화 흐름)
-  const barData = {
-    labels: cognitiveMetrics?.map((m) => m.date) || [],
-    datasets: [
-      {
-        label: '발화 속도 (단어/분)',
-        data: cognitiveMetrics?.map((m) => m.speech_rate) || [],
-        backgroundColor: 'rgba(137, 125, 201, 0.8)',
-      },
-    ],
-  };
-
-  const barOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: false,
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-      },
-    },
-  };
-
   return (
     <div className="space-y-6">
-      {/* Welcome Section */}
-      <div className="card overflow-hidden">
-        <div className="relative bg-gradient-to-r from-primary/20 via-secondary-medium/20 to-primary/10 p-8">
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-3">
-              <div>
-                <h1 className="text-h1 font-bold text-neutral-gray-dark">
-                  안녕하세요, 사용자님!
-                </h1>
-                <p className="text-body text-neutral-gray-medium mt-1">
-                  오늘도 사용자님과 함께하는 소중한 하루입니다
-                </p>
-              </div>
-            </div>
-            
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-              <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-caption text-neutral-gray-medium mb-1">전체 기억 점수</div>
-                    <div className="text-h2 font-bold text-primary">
-                      {latestMemoryScore?.overall_score.toFixed(1) || '0'}
-                    </div>
-                  </div>
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <img src="/lucide_brain.svg" alt="뇌" className="w-7 h-7" />
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-caption text-neutral-gray-medium mb-1">타임캡슐</div>
-                    <div className="text-h2 font-bold text-secondary-deep">
-                      {/* TODO: 실제 타임캡슐 개수로 변경 */}
-                      12개
-                    </div>
-                  </div>
-                  <div className="w-12 h-12 rounded-full bg-secondary-deep/10 flex items-center justify-center">
-                    <img src="/mingcute_time-line.svg" alt="타임캡슐" className="w-7 h-7" />
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-caption text-neutral-gray-medium mb-1">마지막 대화</div>
-                    <div className="text-h2 font-bold text-secondary-deep">
-                      {/* TODO: 실제 마지막 대화 시간으로 변경 */}
-                      2시간 전
-                    </div>
-                  </div>
-                  <div className="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center">
-                    <img src="/f7_ellipses-bubble.svg" alt="대화" className="w-7 h-7" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-secondary-medium/5 rounded-full blur-3xl"></div>
-        </div>
-      </div>
-
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -215,6 +123,109 @@ export default function Dashboard() {
             {currentElder?.name}님의 건강 상태를 한눈에 확인하세요
           </p>
         </div>
+      </div>
+
+      {/* Markdown 리포트 */}
+      <div className="card p-8">
+        {isReportLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-neutral-gray-medium">분석 리포트를 불러오는 중...</p>
+            </div>
+          </div>
+        ) : (
+          <div className="prose prose-lg max-w-none">
+            <ReactMarkdown
+              remarkPlugins={[remarkMath]}
+              rehypePlugins={[rehypeKatex]}
+              components={{
+                h1: ({ children }) => (
+                  <h1 className="text-3xl font-bold text-neutral-gray-dark mb-4 pb-2 border-b-2 border-primary">
+                    {children}
+                  </h1>
+                ),
+                h2: ({ children }) => (
+                  <h2 className="text-2xl font-semibold text-neutral-gray-dark mt-8 mb-4">
+                    {children}
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="text-xl font-semibold text-neutral-gray-dark mt-6 mb-3">
+                    {children}
+                  </h3>
+                ),
+                p: ({ children }) => (
+                  <p className="text-body text-neutral-gray-medium leading-relaxed mb-4">
+                    {children}
+                  </p>
+                ),
+                ul: ({ children }) => (
+                  <ul className="list-disc list-inside space-y-2 mb-4 text-neutral-gray-medium">
+                    {children}
+                  </ul>
+                ),
+                ol: ({ children }) => (
+                  <ol className="list-decimal list-inside space-y-2 mb-4 text-neutral-gray-medium">
+                    {children}
+                  </ol>
+                ),
+                li: ({ children }) => (
+                  <li className="ml-4">{children}</li>
+                ),
+                strong: ({ children }) => (
+                  <strong className="font-semibold text-primary">{children}</strong>
+                ),
+                code: ({ children }) => (
+                  <code className="px-2 py-1 bg-neutral-light text-secondary-deep rounded text-sm font-mono">
+                    {children}
+                  </code>
+                ),
+                pre: ({ children }) => (
+                  <pre className="bg-neutral-light p-4 rounded-lg overflow-x-auto mb-4">
+                    {children}
+                  </pre>
+                ),
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-4 border-primary pl-4 italic text-neutral-gray-medium my-4">
+                    {children}
+                  </blockquote>
+                ),
+                table: ({ children }) => (
+                  <div className="overflow-x-auto mb-6">
+                    <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
+                      {children}
+                    </table>
+                  </div>
+                ),
+                thead: ({ children }) => (
+                  <thead className="bg-primary/10">{children}</thead>
+                ),
+                tbody: ({ children }) => (
+                  <tbody className="bg-white divide-y divide-gray-200">{children}</tbody>
+                ),
+                tr: ({ children }) => (
+                  <tr className="hover:bg-gray-50">{children}</tr>
+                ),
+                th: ({ children }) => (
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-neutral-gray-dark">
+                    {children}
+                  </th>
+                ),
+                td: ({ children }) => (
+                  <td className="px-4 py-3 text-sm text-neutral-gray-medium">
+                    {children}
+                  </td>
+                ),
+                hr: () => (
+                  <hr className="my-8 border-t-2 border-gray-200" />
+                ),
+              }}
+            >
+              {analysisReport?.content || exampleMarkdown}
+            </ReactMarkdown>
+          </div>
+        )}
       </div>
 
       {/* 기억 유지 지수 */}
@@ -259,82 +270,6 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-
-      {/* 언어·인지 기능 변화 분석 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="card p-6">
-          <h2 className="text-h2 font-semibold text-neutral-gray-dark mb-4">
-            언어 능력 추이
-          </h2>
-          <Line data={lineData} options={lineOptions} />
-        </div>
-        <div className="card p-6">
-          <h2 className="text-h2 font-semibold text-neutral-gray-dark mb-4">
-            대화 흐름 분석
-          </h2>
-          <Bar data={barData} options={barOptions} />
-        </div>
-      </div>
-
-      {/* 추천 상호작용 가이드 */}
-      {interactionGuide && (
-        <div className="card p-6 bg-gradient-to-r from-primary/10 to-secondary-medium/10 border-primary/30">
-          <h2 className="text-h2 font-semibold text-neutral-gray-dark mb-4">
-            오늘의 추천 상호작용 가이드
-          </h2>
-          <div className="space-y-4">
-            <div className="bg-white rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white flex-shrink-0">
-                  ✨
-                </div>
-                <div>
-                  <h3 className="font-semibold text-neutral-gray-dark mb-1">
-                    추천 대화 주제: {interactionGuide.recommended_topic}
-                  </h3>
-                  <p className="text-sm text-neutral-gray-medium">
-                    {interactionGuide.reason}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white rounded-lg p-4">
-                <h4 className="font-semibold text-neutral-gray-dark mb-2 flex items-center gap-2">
-                  <span className="text-success">✓</span> 대화 팁
-                </h4>
-                <ul className="space-y-1">
-                  {interactionGuide.conversation_tips.map((tip, index) => (
-                    <li key={index} className="text-sm text-neutral-gray-medium flex items-start gap-2">
-                      <span className="text-primary mt-1">•</span>
-                      <span>{tip}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="bg-white rounded-lg p-4">
-                <h4 className="font-semibold text-neutral-gray-dark mb-2 flex items-center gap-2">
-                  <span className="text-error">✗</span> 피해야 할 주제
-                </h4>
-                <ul className="space-y-1">
-                  {interactionGuide.topics_to_avoid.map((topic, index) => (
-                    <li key={index} className="text-sm text-neutral-gray-medium flex items-start gap-2">
-                      <span className="text-error mt-1">•</span>
-                      <span>{topic}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <button className="btn-primary w-full md:w-auto">
-              시도했어요
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

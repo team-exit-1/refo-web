@@ -14,11 +14,15 @@
     "@tanstack/react-query": "^5.90.7",
     "axios": "^1.13.2",
     "chart.js": "^4.5.1",
+    "katex": "^0.16.25",
     "leaflet": "^1.9.4",
     "react": "^19.1.1",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.1.1",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^7.9.5",
+    "rehype-katex": "^7.0.1",
+    "remark-math": "^6.0.0",
     "zustand": "^5.0.8"
   },
   "devDependencies": {

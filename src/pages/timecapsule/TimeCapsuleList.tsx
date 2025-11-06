@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useTimeCapsules } from '../hooks/useApi';
-import { useElderStore } from '../stores/elderStore';
-import { useTimeCapsuleStore } from '../stores/timeCapsuleStore';
+import { useTimeCapsules } from '../../hooks/useApi';
+import { useElderStore } from '../../stores/elderStore';
+import { useTimeCapsuleStore } from '../../stores/timeCapsuleStore';
 
 const emotionColors: Record<string, string> = {
   행복: 'bg-yellow-100 text-yellow-800',

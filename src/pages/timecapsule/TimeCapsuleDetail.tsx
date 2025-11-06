@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useTimeCapsule, useDeleteTimeCapsule } from '../hooks/useApi';
-import { useTimeCapsuleStore } from '../stores/timeCapsuleStore';
+import { useTimeCapsule, useDeleteTimeCapsule } from '../../hooks/useApi';
+import { useTimeCapsuleStore } from '../../stores/timeCapsuleStore';
 
 const emotionColors: Record<string, string> = {
   행복: 'bg-yellow-100 text-yellow-800',

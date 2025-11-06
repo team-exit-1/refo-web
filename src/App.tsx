@@ -2,11 +2,12 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import ElderRegistration from './pages/ElderRegistration';
 import Dashboard from './pages/Dashboard';
-import LocationTracking from './pages/LocationTracking';
-import SafeZoneSettings from './pages/SafeZoneSettings';
-import TimeCapsuleList from './pages/TimeCapsuleList';
-import TimeCapsuleCreate from './pages/TimeCapsuleCreate';
-import TimeCapsuleDetail from './pages/TimeCapsuleDetail';
+import LocationTracking from './pages/location/LocationTracking';
+import SafeZoneSettings from './pages/location/SafeZoneSettings';
+import TimeCapsuleList from './pages/timecapsule/TimeCapsuleList';
+import TimeCapsuleCreate from './pages/timecapsule/TimeCapsuleCreate';
+import TimeCapsuleDetail from './pages/timecapsule/TimeCapsuleDetail';
+import RoutineList from './pages/routine/RoutineList';
 
 function App() {
   return (
@@ -20,11 +21,12 @@ function App() {
           <Layout>
             <Routes>
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/location" element={<LocationTracking />} />
-              <Route path="/location/safe-zone" element={<SafeZoneSettings />} />
-              <Route path="/timecapsule" element={<TimeCapsuleList />} />
+              {/* <Route path="/location" element={<LocationTracking />} />
+              <Route path="/location/safe-zone" element={<SafeZoneSettings />} /> */}
+              {/* <Route path="/timecapsule" element={<TimeCapsuleList />} />
               <Route path="/timecapsule/create" element={<TimeCapsuleCreate />} />
-              <Route path="/timecapsule/:id" element={<TimeCapsuleDetail />} />
+              <Route path="/timecapsule/:id" element={<TimeCapsuleDetail />} /> */}
+              <Route path="/routine" element={<RoutineList />} />
             </Routes>
           </Layout>
         } />

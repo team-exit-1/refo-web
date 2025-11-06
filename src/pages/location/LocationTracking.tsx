@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useCurrentLocation, useLocationHistory } from '../hooks/useApi';
-import { useElderStore } from '../stores/elderStore';
-import { useLocationStore } from '../stores/locationStore';
+import { useCurrentLocation, useLocationHistory } from '../../hooks/useApi';
+import { useElderStore } from '../../stores/elderStore';
+import { useLocationStore } from '../../stores/locationStore';
 import { Link } from 'react-router-dom';
 
 // Leaflet 기본 마커 아이콘 설정

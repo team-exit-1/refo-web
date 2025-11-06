@@ -91,3 +91,28 @@ export interface InteractionGuide {
   topics_to_avoid: string[];
   strategies: string[];
 }
+
+// 분석 리포트
+export interface AnalysisReport {
+  content: string; // Markdown 형식의 분석 리포트
+  generated_at: string;
+}
+
+// 루틴
+export interface Routine {
+  id: number;
+  user_id: string;
+  title: string;
+  content: string;
+  times: string; // HH:mm 형식
+  day_of_week: string[]; // ['월', '화', '수', ...]
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RoutineCreateRequest {
+  title: string;
+  content: string;
+  times: string;
+  day_of_week: string[];
+}

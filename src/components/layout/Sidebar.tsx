@@ -6,15 +6,20 @@ const navigationItems = [
     path: '/dashboard',
     icon: '/home.svg',
   },
+  // {
+  //   name: '위치추적',
+  //   path: '/location',
+  //   icon: '/location.svg',
+  // },
+  // {
+  //   name: '타임캡슐',
+  //   path: '/timecapsule',
+  //   icon: '/timecapsule.svg',
+  // },
   {
-    name: '위치추적',
-    path: '/location',
-    icon: '/location.svg',
-  },
-  {
-    name: '타임캡슐',
-    path: '/timecapsule',
-    icon: '/timecapsule.svg',
+    name: '루틴',
+    path: '/routine',
+    icon: '/routine.svg',
   },
 ];
 
