@@ -109,7 +109,7 @@ export default function SafeZoneSettings() {
         <div>
           <h1 className="text-h1 font-bold text-neutral-gray-dark">안전구역 설정</h1>
           <p className="text-body text-neutral-gray-medium mt-1">
-            {currentElder?.name}님의 안전구역을 설정하세요
+            어르신분의 안전구역을 설정하세요
           </p>
         </div>
         <button
@@ -123,7 +123,7 @@ export default function SafeZoneSettings() {
       {/* 사용 방법 */}
       <div className="card p-4 bg-primary/10">
         <p className="text-sm text-neutral-gray-dark">
-          💡 <strong>지도를 클릭</strong>하여 안전구역의 중심을 설정하고, 
+          <strong>지도를 클릭</strong>하여 안전구역의 중심을 설정하고, 
           아래 슬라이더로 반경을 조절하세요.
         </p>
       </div>
@@ -196,7 +196,7 @@ export default function SafeZoneSettings() {
               ⚠️ 알림
             </h3>
             <p className="text-sm text-neutral-gray-medium">
-              {currentElder?.name}님이 안전구역을 벗어나면 즉시 알림을 받습니다.
+              어르신분께서 안전구역을 벗어나면 즉시 알림을 받습니다.
             </p>
           </div>
 
@@ -206,7 +206,7 @@ export default function SafeZoneSettings() {
               onClick={handleSave}
               className="btn-primary w-full"
             >
-              💾 설정 저장
+                설정 저장
             </button>
           )}
         </div>
