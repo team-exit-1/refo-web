@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+// 개발 환경에서는 Vite 프록시 사용, 프로덕션에서는 실제 API URL 사용
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.refo.family';
 
 // Axios 인스턴스 생성
 const axiosInstance = axios.create({

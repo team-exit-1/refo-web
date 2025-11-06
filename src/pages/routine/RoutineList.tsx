@@ -15,6 +15,9 @@ export default function RoutineList() {
     }
   };
 
+  // 전체 로딩 상태 (조회 중이거나 삭제 중)
+  const isProcessing = isLoading || deleteMutation.isPending;
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -27,7 +30,17 @@ export default function RoutineList() {
   }
 
   return (
-    <div>
+    <div className="relative">
+      {/* 삭제 중 오버레이 */}
+      {deleteMutation.isPending && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 text-center">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-neutral-gray-dark font-semibold">루틴을 삭제하는 중...</p>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -38,7 +51,8 @@ export default function RoutineList() {
         </div>
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="btn-primary flex items-center gap-2"
+          disabled={isProcessing}
+          className="btn-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           + 새 루틴 추가
         </button>
@@ -85,7 +99,8 @@ export default function RoutineList() {
                 {/* Actions */}
                 <button
                   onClick={() => handleDelete(routine.id, routine.title)}
-                  className="ml-4 w-10 h-10 rounded-full bg-error/10 text-error hover:bg-error hover:text-white transition-all flex items-center justify-center"
+                  disabled={isProcessing}
+                  className="ml-4 w-10 h-10 rounded-full bg-error/10 text-error hover:bg-error hover:text-white transition-all flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <img src='/mdi_trashcan-outline.svg' alt="삭제" className="w-5 h-5" />
                 </button>
@@ -103,7 +118,8 @@ export default function RoutineList() {
             </p>
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="btn-primary"
+              disabled={isProcessing}
+              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               첫 루틴 만들기
             </button>

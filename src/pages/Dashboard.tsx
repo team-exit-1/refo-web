@@ -10,12 +10,8 @@ import {
   LinearScale,
   BarElement,
 } from 'chart.js';
-import { Radar } from 'react-chartjs-2';
 import ReactMarkdown from 'react-markdown';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
-import 'katex/dist/katex.min.css';
-import { useMemoryScores, useCognitiveMetrics, useAnalysisReport } from '../hooks/useApi';
+import { useUserAnalysis } from '../hooks/useApi';
 import { useElderStore } from '../stores/elderStore';
 
 ChartJS.register(
@@ -32,45 +28,73 @@ ChartJS.register(
 
 export default function Dashboard() {
   const currentElder = useElderStore((state) => state.currentElder);
-  const { data: memoryScores } = useMemoryScores(currentElder?.elder_id || '');
-  const { data: cognitiveMetrics } = useCognitiveMetrics(currentElder?.elder_id || '');
-  const { data: analysisReport, isLoading: isReportLoading } = useAnalysisReport(currentElder?.elder_id || '');
+  const { data: analysisData, isLoading: isAnalysisLoading, error: analysisError } = useUserAnalysis('user_2419');
 
   // 데이터가 없을 때 표시할 예시 Markdown
-  const exampleMarkdown = `# 인지·언어 상태 분석 리포트 (예시)
+  const exampleMarkdown = `# 인지·언어 상태 분석 리포트
 
-## 📊 종합 점수
+## 종합 평가
 
-현재 어르신의 전반적인 인지 기능을 분석한 결과입니다.
+전반적인 인지 기능은 **양호한 상태**입니다.
 
-- **전체 기억 점수**: $\\overline{x} = 77.5$점
-- **평가 기준일**: 2025년 11월 6일
+- 평가 기준일: 2025년 11월 7일
+- 전체 점수: 77.5점 (100점 만점)
 
 ---
 
-## 🧠 주제별 기억 분석
+## 주제별 기억력 분석
 
 ### 1. 가족 관련 기억 (85점)
-가족에 대한 기억이 가장 강하게 유지되고 있습니다. 특히 **손주**에 대한 기억이 선명합니다.
 
-$$
-\\text{Family Score} = \\frac{\\sum_{i=1}^{n} w_i \\cdot s_i}{n} = 85
-$$
+가족에 대한 기억이 가장 잘 유지되고 있습니다. 특히 손주들에 대한 기억이 선명합니다.
 
-**권장 사항**:
-- 가족 사진 앨범을 함께 보며 추억 이야기 나누기
-- 손주들과의 정기적인 영상 통화 유지
+**추천 활동**
+- 가족 사진 앨범을 함께 보며 이야기 나누기
+- 손주들과 정기적으로 영상 통화하기
+- 가족 모임 때 옛날 이야기 들려주기
+
+---
 
 ### 2. 직업/경력 관련 기억 (70점)
-직업 관련 기억은 중간 수준입니다. 일부 세부사항이 흐릿해지는 경향이 있습니다.
 
-**권장 사항**:
-- 과거 직장 동료들과의 만남 주선
-- 직업 관련 성취에 대한 대화 유도
+직장 생활에 대한 기억은 보통 수준입니다. 전반적인 내용은 기억하지만 세부적인 것은 조금씩 잊어가고 있습니다.
+
+**추천 활동**
+- 예전 직장 동료들과 만남 주선하기
+- 직장에서의 성취나 보람 있었던 일 회상하기
+- 과거 업무와 관련된 이야기 나누기
+
+---
+
+### 3. 취미/관심사 (75점)
+
+개인적인 취미 활동에 대한 기억이 잘 유지되고 있습니다.
+
+**추천 활동**
+- 좋아하는 취미 활동 계속 이어가기
+- 새로운 관심사 찾아보기
+- 비슷한 취미를 가진 분들과 교류하기
+
+---
+
+### 4. 중요한 생애 사건 (80점)
+
+인생의 중요한 순간들에 대한 기억이 좋은 편입니다.
+
+**추천 활동**
+- 기념일이나 특별한 날 함께 축하하기
+- 과거 여행이나 특별한 경험 회상하기
+- 인생의 중요한 순간들 사진으로 정리하기
+
+---
 
 `;
 
-  const latestMemoryScore = memoryScores?.[0];
+  // 도메인별 점수를 레이더 차트용으로 변환
+  const getDomainScore = (domainName: string) => {
+    const domain = analysisData?.domains.find(d => d.domain === domainName);
+    return domain?.score || 0;
+  };
 
   // 레이더 차트 데이터 (기억 유지 지수)
   const radarData = {
@@ -78,12 +102,12 @@ $$
     datasets: [
       {
         label: '기억 강도',
-        data: latestMemoryScore
+        data: analysisData?.domains 
           ? [
-              latestMemoryScore.topic_scores.family,
-              latestMemoryScore.topic_scores.career,
-              latestMemoryScore.topic_scores.hobbies,
-              latestMemoryScore.topic_scores.life_events,
+              getDomainScore('가족'),
+              getDomainScore('직업/경력'),
+              getDomainScore('취미/관심사'),
+              getDomainScore('생애 사건'),
             ]
           : [0, 0, 0, 0],
         backgroundColor: 'rgba(174, 147, 223, 0.2)',
@@ -127,18 +151,29 @@ $$
 
       {/* Markdown 리포트 */}
       <div className="card p-8">
-        {isReportLoading ? (
+        {isAnalysisLoading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
               <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-neutral-gray-medium">분석 리포트를 불러오는 중...</p>
+              <p className="text-neutral-gray-medium">AI가 분석 리포트를 생성하는 중...</p>
+              <p className="text-sm text-neutral-gray-light mt-2">수십 초 정도 소요될 수 있습니다</p>
+            </div>
+          </div>
+        ) : analysisError ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="text-6xl mb-4">⚠️</div>
+              <h3 className="text-h3 font-semibold text-neutral-gray-dark mb-2">
+                분석 리포트 생성 실패
+              </h3>
+              <p className="text-neutral-gray-medium mb-4">
+                LLM 서버에서 문제가 발생했습니다. 잠시 후 다시 시도해주세요.
+              </p>
             </div>
           </div>
         ) : (
           <div className="prose prose-lg max-w-none">
             <ReactMarkdown
-              remarkPlugins={[remarkMath]}
-              rehypePlugins={[rehypeKatex]}
               components={{
                 h1: ({ children }) => (
                   <h1 className="text-3xl font-bold text-neutral-gray-dark mb-4 pb-2 border-b-2 border-primary">
@@ -222,54 +257,13 @@ $$
                 ),
               }}
             >
-              {analysisReport?.content || exampleMarkdown}
+              {analysisData?.report || exampleMarkdown}
             </ReactMarkdown>
           </div>
         )}
       </div>
 
-      {/* 기억 유지 지수 */}
-      <div className="card p-6">
-        <h2 className="text-h2 font-semibold text-neutral-gray-dark mb-4">
-          기억 유지 지수
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="flex items-center justify-center">
-            <div className="w-full max-w-md">
-              <Radar data={radarData} options={radarOptions} />
-            </div>
-          </div>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              {latestMemoryScore && (
-                <>
-                  <ScoreItem
-                    label="가족 관련 기억"
-                    score={latestMemoryScore.topic_scores.family}
-                  />
-                  <ScoreItem
-                    label="직업/경력 관련 기억"
-                    score={latestMemoryScore.topic_scores.career}
-                  />
-                  <ScoreItem
-                    label="개인 취미/관심사"
-                    score={latestMemoryScore.topic_scores.hobbies}
-                  />
-                  <ScoreItem
-                    label="중요 생애 사건"
-                    score={latestMemoryScore.topic_scores.life_events}
-                  />
-                </>
-              )}
-            </div>
-            <div className="mt-6 p-4 bg-neutral-light rounded-lg">
-              <p className="text-sm text-neutral-gray-medium">
-                <strong>인사이트:</strong> 가족 관련 기억이 가장 강한 것으로 나타났습니다.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      
     </div>
   );
 }

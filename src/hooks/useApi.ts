@@ -43,11 +43,13 @@ export const useInteractionGuide = (elderId: string) => {
   });
 };
 
-export const useAnalysisReport = (elderId: string) => {
+export const useUserAnalysis = (userId: string) => {
   return useQuery({
-    queryKey: ['analysisReport', elderId],
-    queryFn: () => memoryApi.getAnalysisReport(elderId),
-    enabled: !!elderId,
+    queryKey: ['userAnalysis', userId],
+    queryFn: () => memoryApi.getUserAnalysis(userId),
+    enabled: !!userId,
+    staleTime: 1000 * 60 * 5, // 5분간 캐시 유지
+    retry: 1, // LLM 처리 시간이 길어 재시도는 1번만
   });
 };
 

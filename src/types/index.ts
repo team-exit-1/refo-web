@@ -98,6 +98,22 @@ export interface AnalysisReport {
   generated_at: string;
 }
 
+// 도메인별 분석
+export interface DomainAnalysis {
+  domain: string;
+  score: number;
+  insights: string[];
+  analysis: string;
+}
+
+// 사용자 분석 응답
+export interface UserAnalysisData {
+  userid: string;
+  domains: DomainAnalysis[];
+  report: string; // Markdown 형식의 종합 보고서
+  analyzedAt: string;
+}
+
 // 루틴
 export interface Routine {
   id: number;
