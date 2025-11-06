@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 const navigationItems = [
   {
     name: '홈',
-    path: '/',
+    path: '/dashboard',
     icon: '/home.svg',
   },
   {

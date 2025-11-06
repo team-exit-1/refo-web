@@ -116,16 +116,6 @@ export default function TimeCapsuleList() {
               to={`/timecapsule/${capsule.capsule_id}`}
               className="card p-6 hover:shadow-lg transition-all duration-300 hover:scale-105 relative group"
             >
-              {/* Favorite Button */}
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  toggleFavorite(capsule.capsule_id);
-                }}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
-              >
-                {capsule.is_favorite ? '⭐' : '☆'}
-              </button>
 
               {/* Date */}
               <div className="text-caption text-neutral-gray-medium mb-2">
